@@ -4,8 +4,8 @@ First, you have to use git clone the joystickdrivers repository to initiate the 
 
 enter the command line below
 
-$ cd ~/<your workspace>/src
-$ git clone https://github.com/ros-drivers/joystick_drivers/tree/<ros version>-devel
+$ cd ~/catkin_ws/src
+$ git clone https://github.com/ros-drivers/joystick_drivers/tree/melodic-devel
 
 then, enter the following to git clone this respository
 
