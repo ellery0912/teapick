@@ -1,6 +1,6 @@
 # teapick
 
-First, you have to use git clone the joystickdrivers repository to initiate the joy_node
+First, you have to git clone the joystickdrivers repository to initiate the joy_node
 
 enter the command line below
 
