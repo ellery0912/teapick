@@ -30,6 +30,21 @@ turn_finished = 0
 concerto_data = "00.00*00.00*0*00.00*00.00*00.00*0000.00*0000.00*00.00*00.00*00.00*00.00"
 first_ = 0
 pre_state = "go"
+with open('data.json' , 'r') as reader:      #for front end
+    data_json = json.loads(reader.read())
+
+with open('concerto.json' , 'r') as f:      #for concerto response
+    concerto_res = json.load(f)
+
+with open('diffTable.json' , 'r') as f:  #for table
+    diffTable = json.load(f)
+
+with open('lidar.json' , 'r') as f:     #for lidar
+    lidar_data = json.load(f)
+
+with open("pointCMD.json") as f:
+    t_pointCMD_data = json.load(f)
+    pointCMD_data = t_pointCMD_data["posts"][0]
 
     
 def mode_callback(msg):
@@ -143,21 +158,12 @@ def joy_callback(msg):
     left_UD = joy[0]
     right_UD = joy[1]
     if mode == 0:  
-        cmd = "%02d*%03d*%05.2f*%05.2f*%04d*%04d*%d*%02d*%02d*%02d*%021d" % (0, 0, 0, 0, int(left_UD), int(right_UD), mode, 0, 0, 0, 0)        
+        cmd = "%02d*%03d*%05.2f*%05.2f*%04d*%04d*%d*%02d*%02d*%02d*%021d" % (0, 0, 0, 0, float(left_UD), float(right_UD), mode, 0, 0, 0, 0)        
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client.connect((ip, port))
         client.send(("GET /cmd?=C01" + cmd).encode('utf-8'))
         client.close()
         concerto_data = os.popen("curl -s http://169.254.254.169/cmd?=C03").read().strip()
-
-def joy_callback_lai(msg):
-    global concerto_data
-    joy_data = msg.data
-
-    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client.connect((ip, port))
-    client.send(("GET /cmd?=C01" + joy_data).encode('utf-8'))
-    client.close()
 
 
 
@@ -214,15 +220,25 @@ def fcheck_finished():              #update concerto data, and write encoder to 
         print("ok")
 
 
+
+##with open("data.json") as f:
+##    data = json.load(f)
+##    data["diff"] = 2
+##    json.dump(data, open("data.json", "w"))
+
 if __name__ == '__main__':
-    rospy.init_node('http_lai')
+    rospy.init_node('http')
     diff_topic = "/differential_turn"
     joy_topic = "/joy_information"
     position_topic = "/position"
     turnLocation_topic = "/slam_out_pose"
     mode_topic = "/mode"
-
-    rospy.Subscriber(joy_topic, String, joy_callback_lai,queue_size = 1, buff_size = 52428800)
-
+    #rospy.Subscriber(turnLocation_topic, PoseStamped, turnLocation_callback,queue_size=1,buff_size=52428800)
+    #rospy.Subscriber(diff_topic, Int16, diff_callback, queue_size = 1, buff_size = 52428800)
+    #rospy.Subscriber(turnLocation_topic, String, turnLocation_callback, queue_size = 1, buff_size = 52428800)
+    rospy.Subscriber(mode_topic, Int16, mode_callback, queue_size = 1, buff_size = 52428800)
+    #rospy.Subscriber(position_topic, String, position_callback, queue_size = 1, buff_size = 52428800)
+    rospy.Subscriber(joy_topic, String, joy_callback,queue_size = 1, buff_size = 52428800)
+    #fcheck_finished()
     rospy.spin()
     # Spin until ctrl + cl

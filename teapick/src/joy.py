@@ -49,9 +49,9 @@ def CarControl_callback(msg):
       elif LT == 1:
         if diff > 1:
           diff -= 1
-    Duty1=int(axes[1]*100)
-    Duty2=int(axes[3]*100)
-    string = "%04d %04d" %(Duty1, Duty2)
+    Duty1=int(axes[1])
+    Duty2=int(axes[3])
+    string = "%4.2f %4.2f" %(Duty1, Duty2)
     pub_joy.publish(string)
     pub_diff.publish(diff)
     print string
