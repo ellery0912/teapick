@@ -14,7 +14,7 @@ import numpy as np
 
 #"%05.2f*%05.2f*%04.2f*%05.2f*%05.2f*%04.2f*%d*%05.2f*%05.2f*%04.2f*%02d"   57 strings
 
-ip = '169.254.254.169'
+ip = '192.168.0.4'
 port = 80
 mode = 0
 diff = 1
@@ -62,6 +62,10 @@ def mode_callback(msg):
         first_ = 0
         check_finished = 0
     print("mode", temp_mode)
+    mode = msg.data
+
+def mode_callback_fw(msg):
+    global mode
     mode = msg.data
 
 
@@ -157,14 +161,16 @@ def joy_callback(msg):
     joy = joy_data.split()
     left_UD = joy[0]
     right_UD = joy[1]
-    mode=0
-    if mode == 0:  
-        cmd = "%02d*%03d*%05.2f*%05.2f*%04d*%04d*%d*%02d*%02d*%02d*%021d" % (0, 0, 0, 0, float(left_UD), float(right_UD), mode, 0, 0, 0, 0)        
-        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client.connect((ip, port))
-        client.send(("GET /cmd?=C01" + cmd).encode('utf-8'))
-        client.close()
-        concerto_data = os.popen("curl -s http://169.254.254.169/cmd?=C03").read().strip()
+    cmd = "%02d*%03d*%05.2f*%05.2f*%04d*%04d*%d*%02d*%02d*%02d*%021d" % (0, 0, 0, 0, float(left_UD), float(right_UD), mode, 0, 0, 0, 0)        
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client.connect((ip, port))
+    request_line="GET /paramC01="+cmd+" HTTP/1.1\r\n\r\n\r\n\r\n"
+    client.send(request_line.encode())
+    recv_data=client.recv(10)
+    recv_data=recv_data.decode()
+    print(recv_data)
+    client.close()
+#    concerto_data = os.popen("curl -s http://169.254.254.169/cmd?=C03").read().strip()
 
 
 
@@ -239,6 +245,7 @@ if __name__ == '__main__':
     #rospy.Subscriber(turnLocation_topic, String, turnLocation_callback, queue_size = 1, buff_size = 52428800)
     #rospy.Subscriber(mode_topic, Int16, mode_callback, queue_size = 1, buff_size = 52428800)
     #rospy.Subscriber(position_topic, String, position_callback, queue_size = 1, buff_size = 52428800)
+    rospy.Subscriber(mode_topic, Int16, mode_callback_fw, queue_size = 1, buff_size = 52428800)
     rospy.Subscriber(joy_topic, String, joy_callback,queue_size = 1, buff_size = 52428800)
     #fcheck_finished()
     rospy.spin()
