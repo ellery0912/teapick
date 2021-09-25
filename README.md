@@ -6,7 +6,7 @@ enter the command line below
 
 $ cd ~/catkin_ws/src
 
-$ git clone https://github.com/ros-drivers/joystick_drivers/tree/melodic-devel
+$ git clone https://github.com/ros-drivers/joystick_drivers/tree/melodic-devel.git
 
 then, enter the following to git clone this respository
 
